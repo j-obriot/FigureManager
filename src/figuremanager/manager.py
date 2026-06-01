@@ -81,7 +81,9 @@ class FigureManager(QtWidgets.QMainWindow):
         vbox.addWidget(toolbar)
         vbox.addWidget(canvas)
 
+        MAX_LEN = 15
         tab_name = _get_title(fig)
+        tab_name = (tab_name[:MAX_LEN] + '...') if len(tab_name) > MAX_LEN else tab_name
 
         self.tab_widget.addTab(tab_container, tab_name)
         self.tab_widget.setCurrentWidget(tab_container)
