@@ -13,7 +13,7 @@ class FigureManager(QtWidgets.QMainWindow):
     """
     Top‑level Qt with QTabWidget to hold figures
     """
-    def __init__(self):
+    def __init__(self, show_empty_window):
         super().__init__()
         self.setWindowTitle('FigureManager')
         self.resize(1280, 720)
@@ -27,7 +27,8 @@ class FigureManager(QtWidgets.QMainWindow):
         self.tab_widget.setTabsClosable(True)
         self.tab_widget.tabCloseRequested.connect(self._close_tab)
         
-        self.show()
+        if show_empty_window:
+            self.show()
 
     def _close_tab(self, index: int):
         """
@@ -80,13 +81,13 @@ class FigureManager(QtWidgets.QMainWindow):
         self.activateWindow()
 
 
-def start_figure_manager():
+def start_figure_manager(show_empty_window=False):
     """
     Monkey-patches plt.show()
     Embeds current figure, plt.gcf(), inside a master window.
     """
     _app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
-    _master_win = FigureManager()
+    _master_win = FigureManager(show_empty_window)
 
     _original_show = plt.show
 
