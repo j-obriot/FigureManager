@@ -8,8 +8,7 @@ https://github.com/user-attachments/assets/cda67a61-ea3c-4352-8c66-efb3ca68867e
 
 ```py
 import matplotlib.pyplot as plt
-import figuremanager # must be imported after matplotlib
-figuremanager.start_figure_manager()
+import figuremanager
 
 plt.plot(...)
 plt.show()

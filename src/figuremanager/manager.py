@@ -80,20 +80,14 @@ class FigureManager(QtWidgets.QMainWindow):
         self.raise_()
         self.activateWindow()
 
+_app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
+_master_win = FigureManager(False)
 
-def start_figure_manager(show_empty_window=False):
-    """
-    Monkey-patches plt.show()
-    Embeds current figure, plt.gcf(), inside a master window.
-    """
-    _app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
-    _master_win = FigureManager(show_empty_window)
+_original_show = plt.show
 
-    _original_show = plt.show
+def _patched_show(*args, **kwargs):
+    fig = plt.gcf()
+    _master_win.add_figure_as_tab(fig)
+    return None
 
-    def _patched_show(*args, **kwargs):
-        fig = plt.gcf()
-        _master_win.add_figure_as_tab(fig)
-        return None
-
-    plt.show = _patched_show
+plt.show = _patched_show
