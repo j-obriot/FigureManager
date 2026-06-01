@@ -9,6 +9,28 @@ from matplotlib.backends.backend_qt5agg import (
 
 from PyQt5 import QtWidgets
 
+def _get_title(fig: plt.Figure):
+    tab_name = getattr(fig, "_tab_name", None)
+    if tab_name is not None:
+        return str(tab_name)
+
+    # fallback to suptitle
+    suptitle = fig._suptitle
+    if suptitle is not None and suptitle.get_text():
+        tab_name = suptitle.get_text()
+        return str(tab_name)
+
+    # fallback to axis title if only one exists
+    axes = [ax for ax in fig.get_axes() if ax.get_visible()]
+    if len(axes) == 1:
+        ax_title = axes[0].get_title()
+        if ax_title:
+            return str(ax_title)
+
+    # fallback to figure number
+    return f"Figure {fig.number}"
+
+
 class FigureManager(QtWidgets.QMainWindow):
     """
     Top‑level Qt with QTabWidget to hold figures
@@ -59,14 +81,7 @@ class FigureManager(QtWidgets.QMainWindow):
         vbox.addWidget(toolbar)
         vbox.addWidget(canvas)
 
-        tab_name = getattr(fig, "_tab_name", None)
-        if tab_name is None:
-            suptitle = fig._suptitle
-            if suptitle is not None and suptitle.get_text():
-                tab_name = suptitle.get_text()
-            else:
-                tab_name = f"Figure {fig.number}"
-        tab_name = str(tab_name)
+        tab_name = _get_title(fig)
 
         self.tab_widget.addTab(tab_container, tab_name)
         self.tab_widget.setCurrentWidget(tab_container)
