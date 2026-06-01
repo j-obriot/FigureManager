@@ -2,7 +2,7 @@
 
 Just a simple window that holds all the plots created using matplotlib in a non blocking way while keeping interactivity.
 
-![demo](/demo/demo.mp4)
+https://github.com/user-attachments/assets/cda67a61-ea3c-4352-8c66-efb3ca68867e
 
 ## Usage
 
