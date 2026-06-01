@@ -9,6 +9,9 @@ from matplotlib.backends.backend_qt5agg import (
 
 from PyQt5 import QtWidgets
 
+import pyvista as pv
+from pyvistaqt import QtInteractor
+
 def _get_title(fig: plt.Figure):
     tab_name = getattr(fig, "_tab_name", None)
     if tab_name is not None:
@@ -29,6 +32,16 @@ def _get_title(fig: plt.Figure):
 
     # fallback to figure number
     return f"Figure {fig.number}"
+
+class ManagedPlotter(QtInteractor):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        _master_win.add_pyvista_figure_as_tab(self)
+
+    def show(self, *args, **kwargs):
+        self.parent().show()
+        return self
 
 
 class FigureManager(QtWidgets.QMainWindow):
@@ -97,6 +110,17 @@ class FigureManager(QtWidgets.QMainWindow):
         self.raise_()
         self.activateWindow()
 
+    def add_pyvista_figure_as_tab(self, fig: ManagedPlotter):
+        self.tab_widget.addTab(fig, "test")
+        self.tab_widget.setCurrentWidget(fig)
+        # 
+        # self._canvases.append(canvas)
+        # self._figures.append(fig)
+
+        self.show()
+        self.raise_()
+        self.activateWindow()
+
 _app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
 _master_win = FigureManager(False)
 
@@ -108,3 +132,10 @@ def _patched_show(*args, **kwargs):
     return None
 
 plt.show = _patched_show
+
+
+_original_pvplotter = pv.Plotter
+
+pv.Plotter = ManagedPlotter
+
+
