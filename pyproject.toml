@@ -1,0 +1,13 @@
+[project]
+authors = [{name = "Joseph Obriot", email = "joseph.obriot@cea.fr"}]
+dependencies = [
+    "matplotlib",
+    "PyQt5",
+]
+name = "figuremanager"
+requires-python = ">= 3.9"
+version = "0.1.0"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
