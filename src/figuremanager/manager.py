@@ -1,13 +1,45 @@
 import sys
 import matplotlib
-matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import (
+from matplotlib.backends.backend_qtagg import (
     FigureCanvasQTAgg as FigureCanvas,
     NavigationToolbar2QT as NavigationToolbar,
 )
 
-from PyQt5 import QtWidgets
+from matplotlib.backends import qt_compat
+
+QtGui = qt_compat.QtGui
+QtWidgets = qt_compat.QtWidgets
+QtCore = qt_compat.QtCore
+
+# patch toolbar for a copy to clipboard button
+_old_init_navbar = NavigationToolbar.__init__
+
+def new_init_navbar(self, *args, **kwargs):
+    _old_init_navbar(self, *args, **kwargs)
+
+    pix = QtGui.QPixmap(16, 16)
+    pix.fill(QtCore.Qt.GlobalColor.transparent)
+
+    p = QtGui.QPainter(pix)
+    p.drawRect(1, 1, 10, 10)
+    p.drawRect(5, 5, 10, 10)
+    p.end()
+    icon = QtGui.QIcon(pix)
+
+    action = self.addAction(icon, "Copy")
+    self.removeAction(action)
+    self.insertAction(self.actions()[-1], action)
+
+    action.setToolTip("Copy plot to clipboard")
+    action.triggered.connect(self.copy_to_clipboard)
+
+def copy_to_clipboard(self):
+    QtGui.QGuiApplication.clipboard().setPixmap(self.canvas.grab())
+
+NavigationToolbar.__init__ = new_init_navbar
+NavigationToolbar.copy_to_clipboard = copy_to_clipboard
+
 
 def _get_title(fig: plt.Figure):
     tab_name = getattr(fig, "_tab_name", None)
