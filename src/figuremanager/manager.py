@@ -123,8 +123,6 @@ class FigureManager(QtWidgets.QMainWindow):
         self._canvases.append(canvas)
         self._figures.append(fig)
 
-        plt.close(fig)
-
         self.show()
         self.raise_()
         self.activateWindow()
